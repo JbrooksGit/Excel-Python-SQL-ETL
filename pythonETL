@@ -1,0 +1,30 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Feb  6 11:25:02 2020
+
+@author: jbrooks
+"""
+import pyodbc 
+import pandas as pd
+import os
+
+conn = pyodbc.connect(Driver ='{SQL Server}',
+                      Server ='your_server',
+                      Database ='your_database',
+                      uid ='your_username',
+                      password ='your_password')
+
+file = r'C:\path\to\your\file.xlsx'
+df = pd.read_excel(file,skiprows=0,nrows=None,usecols=None,header = 0,index_col=None)
+
+print(df.to_string())
+
+cursor = conn.cursor()
+
+for index,row in df.iterrows():
+    cursor.execute("INSERT INTO dbo.your_database([col1],[col2],[col3])values (?, ?,?)", row['csv_col1'], 
+                                           row['csv_col2'], 
+                                           row['csv_col3']) 
+    conn.commit()
+cursor.close()
+conn.close()
